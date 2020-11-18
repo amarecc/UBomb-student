@@ -16,6 +16,8 @@ public class World {
     private final Map<Position, Decor> grid;
     private final WorldEntity[][] raw;
     public final Dimension dimension;
+    public boolean decorHasUpdated = false;
+    public Position decorUpdated = null;
 
     public World(WorldEntity[][] raw) {
         this.raw = raw;
@@ -60,7 +62,10 @@ public class World {
     }
 
     public void clear(Position position) {
+        decorUpdated = position;
         grid.remove(position);
+
+        decorHasUpdated = true;
     }
 
     public void forEach(BiConsumer<Position, Decor> fn) {

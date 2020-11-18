@@ -7,6 +7,7 @@ package fr.ubx.poo.engine;
 import fr.ubx.poo.game.Direction;
 import fr.ubx.poo.model.go.monster.Monster;
 import fr.ubx.poo.view.sprite.Sprite;
+import fr.ubx.poo.view.sprite.SpriteDecor;
 import fr.ubx.poo.view.sprite.SpriteFactory;
 import fr.ubx.poo.game.Game;
 import fr.ubx.poo.model.go.character.Player;
@@ -71,7 +72,7 @@ public final class GameEngine {
         input = new Input(scene);
         root.getChildren().add(layer);
         statusBar = new StatusBar(root, sceneWidth, sceneHeight, game);
-        // Create decor sprites
+        //Create decor sprites
         game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
 
@@ -145,6 +146,21 @@ public final class GameEngine {
         if (player.isWinner()) {
             gameLoop.stop();
             showMessage("Gagné", Color.BLUE);
+        }
+        if (game.getWorld().decorHasUpdated) {
+            int i = 0;
+            for (Sprite elem: sprites){
+                if (elem.getPosition().equals(game.getWorld().decorUpdated)){
+                    break;
+                }
+                i++;
+            }
+
+            sprites.get(i).remove();
+            sprites.remove(i);
+            // A refaire c'est pas propre
+            game.getWorld().decorHasUpdated = false;
+            game.getWorld().decorUpdated = null;
         }
     }
 

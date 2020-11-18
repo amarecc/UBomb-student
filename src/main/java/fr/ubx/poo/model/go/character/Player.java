@@ -7,6 +7,7 @@ package fr.ubx.poo.model.go.character;
 import fr.ubx.poo.game.Direction;
 import fr.ubx.poo.game.Position;
 import fr.ubx.poo.model.Movable;
+import fr.ubx.poo.model.decor.Key;
 import fr.ubx.poo.model.go.GameObject;
 import fr.ubx.poo.game.Game;
 
@@ -16,6 +17,7 @@ public class Player extends GameObject implements Movable {
     Direction direction;
     private boolean moveRequested = false;
     private int lives = 1;
+    private int keys = 0;
     private boolean winner;
 
     public Player(Game game, Position position) {
@@ -27,6 +29,8 @@ public class Player extends GameObject implements Movable {
     public int getLives() {
         return lives;
     }
+
+    public int getKeys() { return keys; }
 
     public Direction getDirection() {
         return direction;
@@ -48,8 +52,16 @@ public class Player extends GameObject implements Movable {
         Position nextPos = direction.nextPosition(getPosition());
 
         //Do move if there is no decor
-        if (this.game.getWorld().isEmpty(nextPos) && this.game.getWorld().isInside(nextPos))
-            setPosition(nextPos);
+        if (this.game.getWorld().isInside(nextPos)){
+            if (this.game.getWorld().isEmpty(nextPos))
+                setPosition(nextPos);
+
+            else if (this.game.getWorld().get(nextPos) instanceof Key){
+                this.game.getWorld().clear(nextPos);
+                this.keys++;
+                setPosition(nextPos);
+            }
+        }
     }
 
     public void update(long now) {
