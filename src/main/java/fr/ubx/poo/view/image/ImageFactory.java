@@ -22,6 +22,10 @@ public final class ImageFactory {
             DIGIT_5, DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9,
     };
 
+    private final ImageResource[] directionsMonster = new ImageResource[]{
+            MONSTER_UP, MONSTER_RIGHT, MONSTER_DOWN, MONSTER_LEFT,
+    };
+
     private ImageFactory() {
         images = new Image[ImageResource.values().length];
     }
@@ -56,6 +60,8 @@ public final class ImageFactory {
     public Image getPlayer(Direction direction) {
         return get(directions[direction.ordinal()]);
     }
+
+    public Image getMonster(Direction direction) { return get(directionsMonster[direction.ordinal()]); }
 
     /**
      * Holder
