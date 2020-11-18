@@ -7,9 +7,7 @@ package fr.ubx.poo.view.sprite;
 import static fr.ubx.poo.view.image.ImageResource.*;
 
 import fr.ubx.poo.game.Position;
-import fr.ubx.poo.model.decor.Decor;
-import fr.ubx.poo.model.decor.Stone;
-import fr.ubx.poo.model.decor.Tree;
+import fr.ubx.poo.model.decor.*;
 import fr.ubx.poo.model.go.character.Player;
 import fr.ubx.poo.model.go.monster.Monster;
 import fr.ubx.poo.view.image.ImageFactory;
@@ -24,6 +22,10 @@ public final class SpriteFactory {
             return new SpriteDecor(layer, factory.get(STONE), position);
         if (decor instanceof Tree)
             return new SpriteDecor(layer, factory.get(TREE), position);
+        if (decor instanceof Box)
+            return new SpriteDecor(layer, factory.get(BOX), position);
+        if (decor instanceof Key)
+            return new SpriteDecor(layer, factory.get(KEY), position);
         return null;
     }
 
