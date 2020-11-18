@@ -46,7 +46,9 @@ public class Player extends GameObject implements Movable {
 
     public void doMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
-        if (this.game.getWorld().get(nextPos) == null)
+
+        //Do move if there is no decor
+        if (this.game.getWorld().isEmpty(nextPos) && this.game.getWorld().isInside(nextPos))
             setPosition(nextPos);
     }
 
