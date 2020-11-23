@@ -26,6 +26,8 @@ public class WorldBuilder {
 
     private static Decor processEntity(WorldEntity entity) {
         switch (entity) {
+            case Princess:
+                return new Princess();
             case Key:
                 return new Key();
             case Box:

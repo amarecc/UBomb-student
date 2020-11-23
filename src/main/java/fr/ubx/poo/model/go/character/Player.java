@@ -8,8 +8,13 @@ import fr.ubx.poo.game.Direction;
 import fr.ubx.poo.game.Position;
 import fr.ubx.poo.model.Movable;
 import fr.ubx.poo.model.decor.Key;
+import fr.ubx.poo.model.decor.Princess;
 import fr.ubx.poo.model.go.GameObject;
 import fr.ubx.poo.game.Game;
+import fr.ubx.poo.model.go.monster.Monster;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class Player extends GameObject implements Movable {
 
@@ -61,6 +66,11 @@ public class Player extends GameObject implements Movable {
                 this.keys++;
                 setPosition(nextPos);
             }
+
+            else if (this.game.getWorld().get(nextPos) instanceof Princess){
+                setPosition(nextPos);
+                this.winner = true;
+            }
         }
     }
 
@@ -71,6 +81,10 @@ public class Player extends GameObject implements Movable {
             }
         }
         moveRequested = false;
+
+        if (this.collisionMonster()){
+            this.lives--;
+        }
     }
 
     public boolean isWinner() {
@@ -78,7 +92,17 @@ public class Player extends GameObject implements Movable {
     }
 
     public boolean isAlive() {
-        return alive;
+        return this.lives > 0;
+    }
+
+    public boolean collisionMonster() {
+        for (Monster monster :this.game.getMonsters()){
+            if (monster.getPosition().equals(this.getPosition())){
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
