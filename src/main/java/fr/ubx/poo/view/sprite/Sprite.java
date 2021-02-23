@@ -5,6 +5,7 @@
 package fr.ubx.poo.view.sprite;
 
 import fr.ubx.poo.game.Position;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -15,6 +16,7 @@ public abstract class Sprite {
     private final Pane layer;
     private ImageView imageView;
     private Image image;
+    protected final ColorAdjust effect = new ColorAdjust();
 
     public Sprite(Pane layer, Image image) {
         this.layer = layer;
@@ -39,6 +41,7 @@ public abstract class Sprite {
         imageView = new ImageView(this.image);
         imageView.setX(getPosition().x * size);
         imageView.setY(getPosition().y * size);
+        imageView.setEffect(effect);
         layer.getChildren().add(imageView);
     }
 

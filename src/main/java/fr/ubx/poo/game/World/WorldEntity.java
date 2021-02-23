@@ -2,7 +2,7 @@
  * Copyright (c) 2020. Laurent Réveillère
  */
 
-package fr.ubx.poo.game;
+package fr.ubx.poo.game.World;
 
 import java.util.Arrays;
 import java.util.Optional;

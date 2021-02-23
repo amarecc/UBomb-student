@@ -6,11 +6,9 @@ package fr.ubx.poo.view.sprite;
 
 import fr.ubx.poo.model.go.character.Player;
 import fr.ubx.poo.view.image.ImageFactory;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.Pane;
 
 public class SpritePlayer extends SpriteGameObject {
-    private final ColorAdjust effect = new ColorAdjust();
 
     public SpritePlayer(Pane layer, Player player) {
         super(layer, null, player);
@@ -20,6 +18,11 @@ public class SpritePlayer extends SpriteGameObject {
     @Override
     public void updateImage() {
         Player player = (Player) go;
+
+        if (player.isInvicible())
+            effect.setBrightness(0.8);
+        else
+            effect.setBrightness(0.0);
         setImage(ImageFactory.getInstance().getPlayer(player.getDirection()));
     }
 }

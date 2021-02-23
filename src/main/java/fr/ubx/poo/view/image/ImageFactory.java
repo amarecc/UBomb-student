@@ -26,6 +26,11 @@ public final class ImageFactory {
             MONSTER_UP, MONSTER_RIGHT, MONSTER_DOWN, MONSTER_LEFT,
     };
 
+    private final ImageResource[] bombs = new ImageResource[]{
+        // Direction { N, E, S, W }
+        BOMB_1, BOMB_2, BOMB_3, BOMB_4,
+};
+
     private ImageFactory() {
         images = new Image[ImageResource.values().length];
     }
@@ -59,6 +64,14 @@ public final class ImageFactory {
 
     public Image getPlayer(Direction direction) {
         return get(directions[direction.ordinal()]);
+    }
+
+    public Image getBomb(int sec) {
+        return get(bombs[sec-1]);
+    }
+
+    public Image getExplode() {
+        return get(EXPLOSION);
     }
 
     public Image getMonster(Direction direction) { return get(directionsMonster[direction.ordinal()]); }

@@ -5,42 +5,44 @@
 package fr.ubx.poo.game;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.Properties;
 
+import fr.ubx.poo.game.World.World;
+import fr.ubx.poo.game.World.WorldFromFile;
+
+
 import fr.ubx.poo.model.go.character.Player;
-import fr.ubx.poo.model.go.monster.Monster;
 
 public class Game {
-
     private final World world;
     private final Player player;
-    private final ArrayList<Monster> monsters = new ArrayList<>();
     private final String worldPath;
+    private String prefix;
+    private int nbrLevel;
     public int initPlayerLives;
 
-    public Game(String worldPath) {
-        world = new WorldStatic();
+    public Game(String worldPath){
         this.worldPath = worldPath;
         loadConfig(worldPath);
-        Position positionPlayer = null;
-        ArrayList<Position> positionMonsters = null;
-        try {
-            positionPlayer = world.findPlayer();
-            positionMonsters = world.findMonsters();
-            player = new Player(this, positionPlayer);
 
-            for (Position pos : positionMonsters){
-                monsters.add(new Monster(this, pos));
-            }
-        } catch (PositionNotFoundException e) {
-            System.err.println("Position not found : " + e.getLocalizedMessage());
-            throw new RuntimeException(e);
-        }
+        world = new WorldFromFile(nbrLevel, this.worldPath, prefix).loadAllLevels();
+        Position positionPlayer = null;
+
+        positionPlayer = world.findPlayer();
+        player = new Player(this, positionPlayer);
+
+        world.initializeLevels(this);
+    }
+
+    /**
+     * Update the player position according to the current level
+     */
+    public void updatePlayerPosition() {
+        Position positionPlayer = null;
+
+        positionPlayer = world.findPlayer();
+        player.setPosition(positionPlayer);
     }
 
     public int getInitPlayerLives() {
@@ -53,6 +55,9 @@ public class Game {
             // load the configuration file
             prop.load(input);
             initPlayerLives = Integer.parseInt(prop.getProperty("lives", "3"));
+
+            prefix = prop.getProperty("prefix");
+            nbrLevel = Integer.parseInt(prop.getProperty("levels"));
         } catch (IOException ex) {
             System.err.println("Error loading configuration");
         }
@@ -65,6 +70,4 @@ public class Game {
     public Player getPlayer() {
         return this.player;
     }
-
-    public ArrayList<Monster> getMonsters() { return this.monsters; }
 }

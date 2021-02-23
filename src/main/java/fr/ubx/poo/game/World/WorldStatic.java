@@ -1,6 +1,6 @@
-package fr.ubx.poo.game;
+package fr.ubx.poo.game.World;
 
-import static fr.ubx.poo.game.WorldEntity.*;
+import static fr.ubx.poo.game.World.WorldEntity.*;
 
 public class WorldStatic extends World {
     private static final WorldEntity[][] mapEntities =

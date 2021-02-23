@@ -70,7 +70,7 @@ public class StatusBar {
     private HBox statusGroup(Image kind, Text number) {
         HBox group = new HBox();
         ImageView img = new ImageView(kind);
-        group.setSpacing(4);
+        group.setSpacing(2);
         number.setEffect(ds);
         number.setCache(true);
         number.setFill(Color.BLACK);
@@ -79,11 +79,11 @@ public class StatusBar {
         return group;
     }
 
-    public void update(Game game) {
-        updateLevel(1);
+    public void update(Game game, int gameLevel) {
+        updateLevel(gameLevel);
         liveValue.setText(String.valueOf(game.getPlayer().getLives()));
-        rangeValue.setText("?");
-        bombsValue.setText("?");
+        rangeValue.setText(String.valueOf(game.getPlayer().getRangeBomb()));
+        bombsValue.setText(String.valueOf(game.getPlayer().getBombs()));
         keyValue.setText(String.valueOf(game.getPlayer().getKeys()));
     }
 

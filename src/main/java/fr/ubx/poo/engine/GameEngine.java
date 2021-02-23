@@ -5,13 +5,9 @@
 package fr.ubx.poo.engine;
 
 import fr.ubx.poo.game.Direction;
-import fr.ubx.poo.model.go.monster.Monster;
-import fr.ubx.poo.view.sprite.Sprite;
-import fr.ubx.poo.view.sprite.SpriteDecor;
-import fr.ubx.poo.view.sprite.SpriteFactory;
+import fr.ubx.poo.view.sprite.*;
 import fr.ubx.poo.game.Game;
 import fr.ubx.poo.model.go.character.Player;
-import fr.ubx.poo.view.sprite.SpriteMonster;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -24,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,20 +31,17 @@ public final class GameEngine {
     private final String windowTitle;
     private final Game game;
     private final Player player;
-    private final ArrayList<Monster> monsters;
     private final List<Sprite> sprites = new ArrayList<>();
     private StatusBar statusBar;
     private Pane layer;
     private Input input;
     private Stage stage;
     private Sprite spritePlayer;
-    private List<Sprite> spriteMonsters = new ArrayList<>();
 
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
         this.windowTitle = windowTitle;
         this.game = game;
         this.player = game.getPlayer();
-        this.monsters = game.getMonsters();
         initialize(stage, game);
         buildAndSetGameLoop();
     }
@@ -57,8 +51,8 @@ public final class GameEngine {
         Group root = new Group();
         layer = new Pane();
 
-        int height = game.getWorld().dimension.height;
-        int width = game.getWorld().dimension.width;
+        int height = game.getWorld().getDimension().height;
+        int width = game.getWorld().getDimension().width;
         int sceneWidth = width * Sprite.size;
         int sceneHeight = height * Sprite.size;
         Scene scene = new Scene(root, sceneWidth, sceneHeight + StatusBar.height);
@@ -72,11 +66,13 @@ public final class GameEngine {
         input = new Input(scene);
         root.getChildren().add(layer);
         statusBar = new StatusBar(root, sceneWidth, sceneHeight, game);
-        //Create decor sprites
+
+        //Create decor, player & gameObject sprites
         game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
 
-        monsters.forEach( (monster) -> spriteMonsters.add(SpriteFactory.createMonster(layer, monster) ));
+        game.getWorld().getMonsters().forEach( (monster) -> sprites.add(SpriteFactory.createMonster(layer, monster) ));
+        game.getWorld().getBombs().forEach((bomb) -> sprites.add(SpriteFactory.createBomb(layer, bomb)));
     }
 
     protected final void buildAndSetGameLoop() {
@@ -90,7 +86,7 @@ public final class GameEngine {
 
                 // Graphic update
                 render();
-                statusBar.update(game);
+                statusBar.update(game, game.getWorld().currentLevel+1);
             }
         };
     }
@@ -112,6 +108,16 @@ public final class GameEngine {
         }
         if (input.isMoveUp()) {
             player.requestMove(Direction.N);
+        }
+        if (input.isBomb()) {
+            if (game.getWorld().addBomb(game)) {
+                Sprite spriteBomb = SpriteFactory.createBomb(layer, game.getWorld().getLastBomb());
+                sprites.add(spriteBomb);
+            }
+        }
+
+        if (input.isKey()) {
+            player.requestInteract();
         }
         input.clear();
     }
@@ -138,6 +144,7 @@ public final class GameEngine {
 
     private void update(long now) {
         player.update(now);
+        game.getWorld().updateEntities();
 
         if (player.isAlive() == false) {
             gameLoop.stop();
@@ -147,26 +154,34 @@ public final class GameEngine {
             gameLoop.stop();
             showMessage("Gagné", Color.BLUE);
         }
-        if (game.getWorld().decorHasUpdated) {
-            int i = 0;
-            for (Sprite elem: sprites){
-                if (elem.getPosition().equals(game.getWorld().decorUpdated)){
-                    break;
-                }
-                i++;
-            }
 
-            sprites.get(i).remove();
-            sprites.remove(i);
-            // A refaire c'est pas propre
-            game.getWorld().decorHasUpdated = false;
-            game.getWorld().decorUpdated = null;
+        // Reload every sprites
+        if (game.getWorld().hasChanged) {
+            sprites.forEach(Sprite::remove);
+            sprites.clear();
+            game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
+            game.getWorld().getMonsters().forEach( (monster) -> sprites.add(SpriteFactory.createMonster(layer, monster) ));
+
+            game.getWorld().getBombs().forEach(bomb -> {
+                if (bomb.getBlowUp())
+                    bomb.getExplosionArea().forEach(explosionPos -> sprites.add(SpriteFactory.createExplode(layer, explosionPos)));
+                else
+                    sprites.add(SpriteFactory.createBomb(layer, bomb));
+            });
         }
+
+        if (game.getWorld().levelChanged) {
+            stage.close();
+            game.updatePlayerPosition();
+            initialize(stage, game);
+        }
+
+        game.getWorld().levelChanged = false;
+        game.getWorld().hasChanged = false;
     }
 
     private void render() {
         sprites.forEach(Sprite::render);
-        spriteMonsters.forEach(Sprite::render);
         // last rendering to have player in the foreground
         spritePlayer.render();
     }

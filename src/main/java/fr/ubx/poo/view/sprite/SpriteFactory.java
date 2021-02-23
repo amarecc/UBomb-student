@@ -8,6 +8,8 @@ import static fr.ubx.poo.view.image.ImageResource.*;
 
 import fr.ubx.poo.game.Position;
 import fr.ubx.poo.model.decor.*;
+import fr.ubx.poo.model.decor.bonus.*;
+import fr.ubx.poo.model.go.bombs.*;
 import fr.ubx.poo.model.go.character.Player;
 import fr.ubx.poo.model.go.monster.Monster;
 import fr.ubx.poo.view.image.ImageFactory;
@@ -28,8 +30,22 @@ public final class SpriteFactory {
             return new SpriteDecor(layer, factory.get(KEY), position);
         if (decor instanceof Princess)
             return new SpriteDecor(layer, factory.get(PRINCESS), position);
+        if (decor instanceof BonusBombNbInc)
+            return new SpriteDecor(layer, factory.get(BONUS_BOMB_NB_INC), position);
+        if (decor instanceof BonusBombNbDec)
+            return new SpriteDecor(layer, factory.get(BONUS_BOMB_NB_DEC), position);
+        if (decor instanceof BonusBombRangeDec)
+            return new SpriteDecor(layer, factory.get(BONUS_BOMB_RANGE_DEC), position);
+        if (decor instanceof BonusBombRangeInc)
+            return new SpriteDecor(layer, factory.get(BONUS_BOMB_RANGE_INC), position);
+        if (decor instanceof Heart)
+            return new SpriteDecor(layer, factory.get(HEART), position);
+        if (decor instanceof Door && ((Door) decor).getIsOpen())
+            return new SpriteDecor(layer, factory.get(DOOR_OPENED), position);
+        if (decor instanceof Door && !((Door) decor).getIsOpen())
+            return new SpriteDecor(layer, factory.get(DOOR_CLOSED), position);
 
-        return null;
+        throw new RuntimeException("Unsupported sprite for decor " + decor);
     }
 
     public static Sprite createPlayer(Pane layer, Player player) {
@@ -38,5 +54,13 @@ public final class SpriteFactory {
 
     public static Sprite createMonster(Pane layer, Monster monster) {
         return new SpriteMonster(layer, monster);
+    }
+
+    public static Sprite createBomb(Pane layer, Bomb bomb) {
+        return new SpriteBomb(layer, bomb);
+    }
+
+    public static Sprite createExplode(Pane layer, Position p) {
+        return new SpriteExplode(layer, p);
     }
 }
